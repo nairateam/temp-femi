@@ -1,21 +1,8 @@
 import Hero from "@/components/sections/Hero";
 import ProjectsSection from "@/components/sections/Projects";
-import {
-  getHero,
-  getProjects,
-  normalizeHero,
-  normalizeProject,
-} from "@/lib/strapi/app";
+import { hero, projects } from "@/lib/data/content";
 
-export default async function Home() {
-  const [heroRaw, projectsRaw] = await Promise.all([
-    getHero(),
-    getProjects(),
-  ]);
-
-  const hero = normalizeHero(heroRaw);
-  const projects = projectsRaw.map((p: any) => normalizeProject(p.id, p));
-
+export default function Home() {
   return (
     <div>
       <Hero heroData={hero} />

@@ -1,9 +1,6 @@
-import { getProjects, normalizeProject } from "@/lib/strapi/app";
+import { projects } from "@/lib/data/content";
 import WorkPage from "./components/project-client";
 
-export default async function Page() {
-    const raw = await getProjects();
-    const projects = raw.map((p: any) => normalizeProject(p.id, p));
-
+export default function Page() {
     return <WorkPage projects={projects} />;
 }

@@ -1,0 +1,143 @@
+{
+    "hero": {
+        "greeting": "Hi, I'm ",
+        "name": "Femi Onabule",
+        "roles": [
+            "Frontend",
+            "Engineer"
+        ],
+        "bio": "4+ years turning complex problems into fast, scalable web products — React, Next.js & WordPress. Currently at NativeBrands Digital Agency, Lagos.",
+        "image": "/cms/oluwafemi_4123517eff.png",
+        "cta": {
+            "label": "Let's Talk",
+            "href": "/contact"
+        }
+    },
+    "projects": [
+        {
+            "id": 8,
+            "slug": "sfi-agri",
+            "title": "SFI Agri",
+            "year": 2026,
+            "tags": [
+                "Enterprise",
+                "Multilingual",
+                "Next.js",
+                "Headless CMS",
+                "GSAP"
+            ],
+            "overview": "Enterprise marketing platform for SFI Agri, a UK-registered global agricultural commodities company operating across the UK, Dubai and South Africa. Built with multilingual support and fully headless Strapi CMS integration.",
+            "description": "Built the full frontend for SFI Agri, a London-based agricultural commodities company trading cashew nuts, cocoa beans, sesame seeds and soybeans across international markets. Developed with Next.js and GSAP for scroll-driven animations. All content is managed through a fully headless Strapi CMS with DeepL API integration for automated multilingual translation across English, French and Arabic. Features include a video hero section, animated commodity marquees, interactive global map, services architecture, news/blog section and multi-region support.",
+            "cover": "/cms/sfi_1_404e25999a.png",
+            "hero": "/cms/sfi_1_404e25999a.png",
+            "media": [
+                "/cms/Screenshot_2026_06_12_105906_f05f50f0ae.png",
+                "/cms/Screenshot_2026_06_12_105941_42e0356983.png"
+            ],
+            "role": "Frontend Developer — Next.js, CMS Integration & Internationalisation",
+            "url": "https://sfiagri.com/en",
+            "stack": [
+                "Next.js",
+                "TypeScript",
+                "Tailwind CSS",
+                "GSAP",
+                "Strapi CMS",
+                "DeepL API"
+            ],
+            "challenge": "Building a fully internationalised enterprise website where all content — across multiple languages and regions — is managed entirely through a headless CMS, with no hardcoded copy in the codebase. Automated translation needed to be seamless and accurate for a professional international audience.",
+            "solution": "Integrated Strapi as a fully headless CMS powering every piece of content on the site. Connected the DeepL API to Strapi for automated translation, enabling content editors to publish in English and have translations generated automatically for all supported locales. Built the Next.js frontend with i18n routing for multi-region support, GSAP scroll animations throughout, and a video hero section. Deployed with full SEO and performance optimisation for international markets."
+        },
+        {
+            "id": 10,
+            "slug": "amaka-jobs",
+            "title": "Amaka Jobs",
+            "year": 2026,
+            "tags": [
+                "Job Platform",
+                "Web App",
+                "Frontend",
+                "Next.js",
+                "GSAP"
+            ],
+            "overview": "Africa-focused hiring platform connecting job seekers and employers with smart job matching, employer dashboards and real-time application tracking.",
+            "description": "Amaka is an Africa-focused job platform built to connect employers and job seekers through a clean, modern web experience. The project involved implementing pixel-perfect Figma designs, building smooth GSAP scroll animations, and delivering a fully responsive mobile-first layout across all pages.",
+            "cover": "/cms/amaka_f479e9ef61.png",
+            "hero": "/cms/Screenshot_2026_06_08_141138_1bccf3caf2.png",
+            "media": [
+                "/cms/amaka_f479e9ef61.png",
+                "/cms/Screenshot_2026_06_08_141138_1bccf3caf2.png"
+            ],
+            "role": "Frontend Developer",
+            "url": "https://amakajobs.com",
+            "stack": [
+                "Next.js",
+                "TypeScript",
+                "Tailwind CSS",
+                "GSAP"
+            ],
+            "challenge": "Translating a detailed Figma design into a pixel-perfect, performant web experience while implementing complex GSAP scroll-driven animations that felt smooth across all devices and screen sizes.",
+            "solution": "Built the frontend using Next.js and Tailwind CSS for performance and responsiveness. Implemented GSAP animations with careful attention to scroll triggers and timing to ensure smooth, natural interactions. Maintained close design fidelity throughout by working directly from the Figma file."
+        },
+        {
+            "id": 12,
+            "slug": "simple-sfa",
+            "title": "Simple SFA",
+            "year": 2026,
+            "tags": [
+                "SaaS",
+                "Web App",
+                "Marketing Site",
+                "Next.js",
+                "GSAP"
+            ],
+            "overview": "Marketing website for Simple SFA, a sales force automation platform helping teams track leads, manage pipelines, and boost sales performance without the complexity of traditional CRMs.",
+            "description": "Built the full marketing website for Simple SFA — a Nigerian SaaS product targeting sales teams and field agents. The site features multi-page architecture covering home, features, industries, pricing, about and contact. Implemented GSAP scroll animations, light and dark mode, animated counters, testimonial sliders, pricing toggles and a fully responsive mobile layout.",
+            "cover": "/cms/sfa_9ccb62547e.png",
+            "hero": "/cms/Screenshot_2026_06_09_145615_47ba7d50ac.png",
+            "media": [
+                "/cms/Screenshot_2026_06_09_150005_68e2c20baf.png",
+                "/cms/Screenshot_2026_06_09_145913_5a9b0c8299.png",
+                "/cms/Screenshot_2026_06_09_145825_0a38714ad7.png"
+            ],
+            "role": "Frontend Developer",
+            "url": "https://simplesfa-web.vercel.app/",
+            "stack": [
+                "Next.js",
+                "TypeScript",
+                "Tailwind CSS",
+                "GSAP"
+            ],
+            "challenge": "Building a multi-page SaaS marketing site that felt polished and performant across light and dark modes, while delivering smooth GSAP scroll animations without affecting page load speed or layout stability.",
+            "solution": "Implemented Next.js App Router for fast page transitions and SEO. Used GSAP ScrollTrigger for scroll-driven animations with careful performance optimization. Built a theme system supporting full light/dark mode across all pages. Delivered a fully responsive layout optimized for mobile, tablet and desktop."
+        },
+        {
+            "id": 14,
+            "slug": "reelfruit",
+            "title": "ReelFruit E-Commerce",
+            "year": 2026,
+            "tags": [
+                "E-Commerce",
+                "WordPress",
+                "WooCommerce",
+                "Payment Integration"
+            ],
+            "overview": "Full e-commerce rebuild for ReelFruit, one of Nigeria's leading healthy snack brands. Resolved a broken shopping experience and delivered a stable, conversion-ready storefront with Nigerian payment gateway integrations.",
+            "description": "ReelFruit's previous website had critical issues across their cart and checkout flow, causing failed transactions and lost sales. Rebuilt the entire e-commerce experience from the ground up using WordPress, Elementor and WooCommerce. Integrated Paystack and Interswitch as payment gateways. Implemented custom Lagos-only delivery logic with conditional pickup and delivery options, state-level delivery restrictions via PHP snippets, and custom order notices — resulting in a fully functional, conversion-ready storefront for one of Nigeria's most recognised snack brands.",
+            "cover": "/cms/reelfruits_95d83f87f1.png",
+            "hero": "/cms/Screenshot_2026_06_11_142141_a72689eef5.png",
+            "media": [],
+            "role": "WordPress & WooCommerce Developer",
+            "url": "https://reelfruit.com",
+            "stack": [
+                "WordPress",
+                "WooCommerce",
+                "Elementor",
+                "Paystack",
+                "Interswitch",
+                "PHP"
+            ],
+            "challenge": "The existing ReelFruit website had broken authentication flows, failed payment processing, and a dysfunctional checkout experience that was actively losing the business sales. The delivery logic also needed to be customised for Lagos-only fulfilment with conditional pickup and delivery options — something WooCommerce doesn't support out of the box.",
+            "solution": "Rebuilt the full WooCommerce store from scratch using Elementor for the frontend. Integrated both Paystack and Interswitch payment gateways to support Nigerian customers. Wrote custom PHP snippets to implement state-level delivery restrictions, Lagos-only fulfilment logic, conditional pickup/delivery options, and custom order notices. Delivered a stable, tested storefront that resolved all critical checkout issues and went live without disruption to the business."
+        }
+    ]
+}
