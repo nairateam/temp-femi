@@ -15,6 +15,47 @@
     },
     "projects": [
         {
+            "id": 18,
+            "slug": "ten-q-beauty",
+            "title": "Ten-Q Beauty",
+            "year": 2026,
+            "tags": [
+                "E-commerce",
+                "Redesign",
+                "Next.js",
+                "Payload CMS",
+                "GSAP"
+            ],
+            "overview": "A full storefront redesign for Ten-Q Beauty, a Nigerian natural haircare brand for textured hair — rebuilt from a WordPress and WooCommerce site into a headless Next.js and Payload store.",
+            "description": "Ten-Q Beauty makes science-backed haircare from African botanicals for kinks, coils, curls and locs. Their existing store ran on WordPress, Elementor and WooCommerce. The pitch: a ground-up redesign with an editorial, nature-led storefront with a cinematic video hero, shopping by hair concern and hair type, a guided four-step routine, a journal, and a full cart-to-checkout flow with Paystack — all managed from Payload CMS.",
+            "cover": "/projects/tenq/cover.webp",
+            "hero": "/projects/tenq/hero.webp",
+            "media": [
+                "/projects/tenq/bestsellers.webp",
+                "/projects/tenq/philosophy.webp",
+                "/projects/tenq/routine.webp",
+                "/projects/tenq/shop.webp",
+                "/projects/tenq/product.webp",
+                "/projects/tenq/journal.webp",
+                "/projects/tenq/salon.webp"
+            ],
+            "role": "Frontend & Full-stack Developer — Redesign Pitch",
+            "url": "https://tenq-beauty.vercel.app/",
+            "stack": [
+                "Next.js",
+                "TypeScript",
+                "Payload CMS",
+                "MongoDB",
+                "Tailwind CSS",
+                "GSAP",
+                "Lenis",
+                "Paystack",
+                "Cloudinary"
+            ],
+            "challenge": "The old store sold kits and products well enough, but felt like a template: generic product grids, no way to shop by hair concern, and content locked inside Elementor layouts. The brand story, a founder's lifelong struggle with dandruff and dry hair and a formulation approach backed by a cosmetic chemist, got lost. The redesign needed to feel premium and on-brand while staying easy for a small team to run day to day.",
+            "solution": "- **Headless commerce** on Next.js 16 and Payload CMS 3 with the official ecommerce plugin: products, variants, collections, reviews, promo codes and shipping all editable from one admin\n- **Shop by need** with filters for hair concern and hair type, plus a guided cleanse, condition, activate and seal routine\n- **Paystack checkout** with an instant add-to-bag cart and order confirmation flow\n- **Editorial motion** with GSAP SplitText reveals, ScrollTrigger storytelling and Lenis smooth scrolling over a video hero\n- **Content the team can own**: journal articles, testimonials and store settings in Payload, with media served from Cloudinary"
+        },
+        {
             "id": 16,
             "slug": "blink",
             "title": "Bl!nk",
