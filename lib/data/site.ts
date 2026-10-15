@@ -22,8 +22,7 @@ export const site = {
     role: "Frontend Engineer",
     location: "Lagos, Nigeria",
     timeZone: "Africa/Lagos",
-    // TODO: replace with your real address and profile URLs.
-    email: "hello@oluwafemi-dev.com",
+    email: "onabulefemi@gmail.com",
     resumeUrl: RESUME_URL,
     available: true,
     nav: [
@@ -34,6 +33,7 @@ export const site = {
     ] satisfies NavItem[],
     cta: { label: "Let's talk", href: "/contact" },
     socials: [
+        // TODO: replace with your real profile URLs.
         { label: "GitHub", href: "https://github.com/yourhandle", icon: "github" },
         { label: "LinkedIn", href: "https://linkedin.com/in/yourhandle", icon: "linkedin" },
         { label: "X", href: "https://x.com/yourhandle", icon: "x" },
