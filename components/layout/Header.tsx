@@ -1,236 +1,210 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { siteConfig } from "@/lib/data/homepage";
+import { usePathname } from "next/navigation";
+import { site, type NavItem } from "@/lib/data/site";
+import { useLenis } from "@/components/providers/SmoothScroll";
+import { Availability, LocalTime, PillButton, RollText, SocialLinks } from "@/components/ui/Primitives";
 
-function MagneticCta({ href, label }: { href: string; label: string }) {
-    const ref = useRef<HTMLAnchorElement>(null);
-
-    const handleMouseMove = (e: React.MouseEvent) => {
-        const el = ref.current;
-        if (!el) return;
-        const rect = el.getBoundingClientRect();
-        const x = e.clientX - rect.left - rect.width / 2;
-        const y = e.clientY - rect.top - rect.height / 2;
-        el.style.transform = `translate(${x * 0.25}px, ${y * 0.35}px)`;
-    };
-
-    const handleMouseLeave = () => {
-        if (ref.current) ref.current.style.transform = "translate(0, 0)";
-    };
-
-    return (
-        <Link
-            ref={ref}
-            href={href}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            className="px-5 py-2 rounded-full border border-[#0d1b2a]/30 text-[#0d1b2a] text-[13px] font-semibold transition-colors duration-200 hover:bg-[#0d1b2a] hover:text-[#f5f0e8]"
-            style={{ transition: "transform 0.15s ease, background-color 0.2s, color 0.2s" }}
-        >
-            {label}
-        </Link>
-    );
+function isActive(pathname: string, href: string) {
+    return href !== "/" && (pathname === href || pathname.startsWith(`${href}/`));
 }
 
-function NavLink({
-    href,
-    label,
-    external,
-}: {
-    href: string;
-    label: string;
-    external?: boolean;
-}) {
-    const className =
-        "group relative font-semibold text-[14px] text-[#0d1b2a] tracking-wide overflow-hidden inline-block";
+function NavLink({ item, active }: { item: NavItem; active: boolean }) {
+    const className = `group relative inline-flex items-center gap-1 py-1 text-[14px] font-medium tracking-tight transition-colors duration-300 ${
+        active ? "text-ink" : "text-ink/60 hover:text-ink"
+    }`;
 
     const content = (
         <>
-            <span className="block transition-transform duration-300 ease-[cubic-bezier(.76,0,.24,1)] group-hover:-translate-y-full">
-                {label}
-            </span>
+            <RollText>{item.label}</RollText>
+            {item.external && <span aria-hidden="true" className="text-[11px] opacity-60">↗</span>}
             <span
-                className="absolute inset-0 translate-y-full transition-transform duration-300 ease-[cubic-bezier(.76,0,.24,1)] group-hover:translate-y-0"
                 aria-hidden="true"
-            >
-                {label}
-            </span>
+                className={`absolute -bottom-0.5 left-0 h-px w-full origin-left bg-ink transition-transform duration-500 ease-out-expo ${
+                    active ? "scale-x-100" : "scale-x-0"
+                }`}
+            />
         </>
     );
 
-    return external ? (
-        <a
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={className}
-        >
+    return item.external ? (
+        <a href={item.href} target="_blank" rel="noopener noreferrer" className={className}>
             {content}
         </a>
     ) : (
-        <Link href={href} className={className}>
+        <Link href={item.href} className={className} aria-current={active ? "page" : undefined}>
             {content}
         </Link>
     );
 }
 
 export default function Navbar() {
+    const pathname = usePathname();
+    const lenis = useLenis();
     const [menuOpen, setMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const [hidden, setHidden] = useState(false);
 
+    // Shrink into a floating pill once scrolled; tuck away while scrolling down.
     useEffect(() => {
-        const onScroll = () => setScrolled(window.scrollY > 20);
+        let lastY = window.scrollY;
+        const onScroll = () => {
+            const y = window.scrollY;
+            setScrolled(y > 24);
+            if (Math.abs(y - lastY) > 6) {
+                setHidden(y > lastY && y > 320);
+                lastY = y;
+            }
+        };
+        onScroll();
         window.addEventListener("scroll", onScroll, { passive: true });
         return () => window.removeEventListener("scroll", onScroll);
     }, []);
 
+    // Close the menu whenever the route changes.
+    const [prevPath, setPrevPath] = useState(pathname);
+    if (prevPath !== pathname) {
+        setPrevPath(pathname);
+        setMenuOpen(false);
+    }
+
     useEffect(() => {
-        document.body.style.overflow = menuOpen ? "hidden" : "";
-        return () => { document.body.style.overflow = ""; };
-    }, [menuOpen]);
+        if (!menuOpen) return;
+        lenis?.stop();
+        document.documentElement.style.overflow = "hidden";
+        const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
+        window.addEventListener("keydown", onKey);
+        return () => {
+            lenis?.start();
+            document.documentElement.style.overflow = "";
+            window.removeEventListener("keydown", onKey);
+        };
+    }, [menuOpen, lenis]);
 
     return (
         <>
-            <nav
-                className={` max-w-420 mx-auto
-                    fixed top-0 left-0 right-0 z-50
-                    flex items-center justify-between
-                    px-5 md:px-8
-                    transition-all duration-300
-                    ${scrolled
-                        ? "py-4 bg-[#FFF]/90 backdrop-blur-md shadow-[0_1px_0_0_rgba(13,27,42,0.08)] rounded-full top-5 mx-5! md:mx-auto!"
-                        : "py-6 bg-transparent"
-                    }
-                `}
+            <header
+                className={`fixed inset-x-0 top-0 z-50 px-3 sm:px-4 transition-transform duration-700 ease-out-expo ${
+                    hidden && !menuOpen ? "-translate-y-[130%]" : "translate-y-0"
+                }`}
             >
-                <Link
-                    href="/"
-                    className="relative z-50 font-[family-name:var(--font-heading)] text-[1.4rem] md:text-[1.8rem] tracking-[0.08em] text-[#0d1b2a] hover:opacity-70 transition-opacity"
-                    onClick={() => setMenuOpen(false)}
+                <nav
+                    aria-label="Primary"
+                    className={`mx-auto flex max-w-[1680px] items-center justify-between rounded-full transition-all duration-700 ease-out-expo ${
+                        scrolled && !menuOpen
+                            ? "mt-3 bg-paper/75 px-5 py-2.5 shadow-[0_1px_0_rgba(13,27,42,0.06),0_12px_40px_-12px_rgba(13,27,42,0.18)] ring-1 ring-ink/5 backdrop-blur-xl md:px-6 lg:max-w-5xl"
+                            : "mt-0 bg-transparent px-2 py-5 sm:px-4 md:py-6"
+                    }`}
                 >
-                    {siteConfig.logo}
-                </Link>
-
-                <ul className="hidden md:flex items-center gap-8">
-                    {siteConfig.nav.map((item) => (
-                        <li key={item.label}>
-                            <NavLink
-                                href={item.href}
-                                label={item.label}
-                                external={item.external}
-                            />
-                        </li>
-                    ))}
-                    <li>
-                        <MagneticCta href={siteConfig.ctaHref} label={siteConfig.ctaLabel} />
-                    </li>
-                </ul>
-
-                <button
-                    aria-label={menuOpen ? "Close menu" : "Open menu"}
-                    aria-expanded={menuOpen}
-                    onClick={() => setMenuOpen((v) => !v)}
-                    className="relative z-50 flex md:hidden items-center justify-center w-8 h-8 focus:outline-none"
-                >
-                    <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        aria-hidden="true"
+                    <Link
+                        href="/"
+                        className="relative z-50 font-heading text-[1.35rem] tracking-[0.04em] text-ink transition-opacity hover:opacity-70 md:text-[1.6rem]"
+                        aria-label={`${site.name} — home`}
                     >
-                        {/* Top line → upper diagonal */}
-                        <line
-                            x1="0" y1="0" x2="18" y2="0"
-                            stroke="#0d1b2a"
-                            strokeWidth="1.5"
-                            strokeLinecap="round"
-                            className="origin-center transition-all duration-300"
-                            style={{
-                                transform: menuOpen
-                                    ? "translateY(9px) rotate(45deg)"
-                                    : "translateY(0px) rotate(0deg)",
-                                transformOrigin: "9px 0px",
-                            }}
-                        />
-                        {/* Middle line → fades out */}
-                        <line
-                            x1="0" y1="6" x2="12" y2="6"
-                            stroke="#0d1b2a"
-                            strokeWidth="1.5"
-                            strokeLinecap="round"
-                            className="transition-all duration-200"
-                            style={{
-                                opacity: menuOpen ? 0 : 1,
-                                transform: menuOpen ? "scaleX(0)" : "scaleX(1)",
-                                transformOrigin: "0px 6px",
-                            }}
-                        />
-                        {/* Bottom line → lower diagonal */}
-                        <line
-                            x1="0" y1="12" x2="18" y2="12"
-                            stroke="#0d1b2a"
-                            strokeWidth="1.5"
-                            strokeLinecap="round"
-                            className="origin-center transition-all duration-300"
-                            style={{
-                                transform: menuOpen
-                                    ? "translateY(-3px) rotate(-45deg)"
-                                    : "translateY(0px) rotate(0deg)",
-                                transformOrigin: "9px 12px",
-                            }}
-                        />
-                    </svg>
-                </button>
-            </nav>
+                        {site.logo}
+                    </Link>
 
-            <div
-                className={`
-                    fixed inset-0 z-40 flex flex-col bg-[#f5f0e8]
-                    transition-all duration-500 ease-in-out md:hidden
-                    ${menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}
-                `}
-            >
-                <div className="flex flex-col justify-center h-full px-8 sm:px-12 pb-24">
-                    <ul className="flex flex-col gap-2">
-                        {siteConfig.nav.map((item, i) => (
-                            <li
-                                key={item.label}
-                                style={{ transitionDelay: menuOpen ? `${80 + i * 60}ms` : "0ms" }}
-                                className={`group relative overflow-hidden transition-all duration-500 ${menuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
-                            >
-                                <span
-                                    className="absolute bottom-0 left-0 h-[1.5px] w-0 bg-[#0d1b2a] transition-all duration-500 ease-[cubic-bezier(.76,0,.24,1)] group-hover:w-full"
-                                />
-                                <Link
-                                    href={item.href}
-                                    onClick={() => setMenuOpen(false)}
-                                    className="block font-[family-name:var(--font-heading)] text-[clamp(3rem,12vw,5.5rem)] tracking-[0.04em] leading-[1.05] text-[#0d1b2a] transition-opacity duration-300 group-hover:opacity-60"
-                                >
-                                    {item.label}
-                                </Link>
+                    <ul className="hidden items-center gap-8 md:flex">
+                        {site.nav.map((item) => (
+                            <li key={item.label}>
+                                <NavLink item={item} active={isActive(pathname, item.href)} />
                             </li>
                         ))}
                     </ul>
 
-                    <div
-                        style={{ transitionDelay: menuOpen ? `${80 + siteConfig.nav.length * 60}ms` : "0ms" }}
-                        className={`mt-12 transition-all duration-500 ${menuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+                    <div className="hidden md:block">
+                        <PillButton href={site.cta.href} size="sm" variant="solid">
+                            {site.cta.label}
+                        </PillButton>
+                    </div>
+
+                    <button
+                        type="button"
+                        aria-label={menuOpen ? "Close menu" : "Open menu"}
+                        aria-expanded={menuOpen}
+                        aria-controls="mobile-menu"
+                        onClick={() => setMenuOpen((v) => !v)}
+                        className="relative z-50 flex h-11 w-11 items-center justify-center rounded-full bg-ink text-paper md:hidden"
                     >
-                        <Link
-                            href={siteConfig.ctaHref}
-                            onClick={() => setMenuOpen(false)}
-                            className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-[#0d1b2a]/30 text-[#0d1b2a] text-[14px] font-semibold hover:bg-[#0d1b2a] hover:text-[#f5f0e8] transition-colors duration-200"
-                        >
-                            {siteConfig.ctaLabel}
-                        </Link>
+                        <span className="relative block h-3 w-5">
+                            <span
+                                className={`absolute left-0 top-0 h-[1.5px] w-full rounded bg-current transition-transform duration-500 ease-out-expo ${
+                                    menuOpen ? "translate-y-[5.25px] rotate-45" : ""
+                                }`}
+                            />
+                            <span
+                                className={`absolute bottom-0 left-0 h-[1.5px] w-full rounded bg-current transition-transform duration-500 ease-out-expo ${
+                                    menuOpen ? "-translate-y-[5.25px] -rotate-45" : ""
+                                }`}
+                            />
+                        </span>
+                    </button>
+                </nav>
+            </header>
+
+            {/* Mobile menu */}
+            <div
+                id="mobile-menu"
+                aria-hidden={!menuOpen}
+                inert={!menuOpen}
+                className={`fixed inset-0 z-40 flex flex-col bg-paper transition-[clip-path] duration-[900ms] ease-in-out-quart md:hidden ${
+                    menuOpen ? "[clip-path:inset(0_0_0_0)]" : "[clip-path:inset(0_0_100%_0)]"
+                }`}
+            >
+                <div className="flex h-full flex-col justify-between px-6 pb-8 pt-28 sm:px-10">
+                    <ul className="flex flex-col">
+                        {site.nav.map((item, i) => {
+                            const linkClass =
+                                "flex items-baseline justify-between border-b border-ink/10 py-4 font-heading text-[clamp(2.6rem,11vw,4.5rem)] leading-none tracking-tight text-ink";
+                            const label = (
+                                <>
+                                    <span>{item.label}</span>
+                                    <span className="font-sans text-xs tabular-nums text-ink/35">
+                                        {item.external ? "↗" : String(i + 1).padStart(2, "0")}
+                                    </span>
+                                </>
+                            );
+                            return (
+                                <li key={item.label} className="overflow-hidden">
+                                    <div
+                                        className={`transition-transform duration-[900ms] ease-out-expo ${
+                                            menuOpen ? "translate-y-0" : "translate-y-full"
+                                        }`}
+                                        style={{ transitionDelay: menuOpen ? `${250 + i * 70}ms` : "0ms" }}
+                                    >
+                                        {item.external ? (
+                                            <a href={item.href} target="_blank" rel="noopener noreferrer" className={linkClass}>
+                                                {label}
+                                            </a>
+                                        ) : (
+                                            <Link href={item.href} className={linkClass} onClick={() => setMenuOpen(false)}>
+                                                {label}
+                                            </Link>
+                                        )}
+                                    </div>
+                                </li>
+                            );
+                        })}
+                    </ul>
+
+                    <div
+                        className={`flex flex-col gap-6 transition-all duration-700 ease-out-expo ${
+                            menuOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+                        }`}
+                        style={{ transitionDelay: menuOpen ? "550ms" : "0ms" }}
+                    >
+                        <a href={`mailto:${site.email}`} className="text-lg font-medium text-ink underline decoration-ink/20 underline-offset-4">
+                            {site.email}
+                        </a>
+                        <SocialLinks />
+                        <div className="flex items-center justify-between text-xs text-ink/45">
+                            <Availability />
+                            <LocalTime />
+                        </div>
                     </div>
                 </div>
-
-                <div className="absolute bottom-12 left-8 sm:left-12 right-8 sm:right-12 h-[1px] bg-[#0d1b2a]/10" />
             </div>
         </>
     );

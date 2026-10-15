@@ -1,219 +1,158 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
-import { gsap, SplitText, ScrollTrigger } from "@/lib/gsap";
-
-import { Bebas_Neue } from "next/font/google";
-import { ArrowDownRight, ArrowRightIcon } from "lucide-react";
-import { HeroData } from "@/lib/strapi/types";
-
-const bebasNeue = Bebas_Neue({ subsets: ["latin"], weight: "400" });
+import { gsap, SplitText } from "@/lib/gsap";
+import type { HeroData } from "@/lib/strapi/types";
+import { site } from "@/lib/data/site";
+import { Availability, PillButton } from "@/components/ui/Primitives";
+import { useScrollTo } from "@/components/providers/SmoothScroll";
 
 export default function Hero({ heroData }: { heroData: HeroData }) {
-    const container = useRef<HTMLDivElement>(null);
-    const imageRef = useRef<HTMLDivElement>(null);
+    const container = useRef<HTMLElement>(null);
+    const scrollTo = useScrollTo();
+    const greeting = `${heroData.greeting.trim()} ${heroData.name}`;
 
-    useGSAP(() => {
-        const greetingSplit = new SplitText(".hero-greeting", { type: "words" });
+    useGSAP(
+        () => {
+            gsap.set(".js-intro", { visibility: "visible" });
 
-        gsap.from(greetingSplit.words, {
-            opacity: 0,
-            y: 12,
-            duration: 0.6,
-            ease: "power3.out",
-            stagger: 0.08,
-            delay: 0.1,
-        });
+            const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
 
-        const roleSplit = new SplitText(".hero-role", { type: "lines", linesClass: "hero-role-line" });
+            tl.fromTo(
+                ".hero-portrait",
+                { clipPath: "inset(100% 0% 0% 0%)", yPercent: 8 },
+                { clipPath: "inset(0% 0% 0% 0%)", yPercent: 0, duration: 1.6, ease: "expo.inOut" },
+                0
+            );
 
-        gsap.set(".hero-role-line", { overflow: "hidden" });
+            SplitText.create(".hero-role", {
+                type: "chars",
+                mask: "chars",
+                onSplit: (self) =>
+                    tl.from(self.chars, { yPercent: 110, duration: 1.4, stagger: 0.025 }, 0.45),
+            });
 
-        const roleChars = new SplitText(".hero-role-line", { type: "chars" });
+            SplitText.create(".hero-greeting", {
+                type: "words",
+                mask: "words",
+                onSplit: (self) =>
+                    tl.from(self.words, { yPercent: 110, duration: 1.1, stagger: 0.05 }, 0.75),
+            });
 
-        gsap.set(roleChars.chars, {
-            clipPath: "inset(100% 0 0 0)",
-            willChange: "clip-path",
-        });
+            SplitText.create(".hero-bio", {
+                type: "lines",
+                mask: "lines",
+                onSplit: (self) =>
+                    tl.from(self.lines, { yPercent: 110, duration: 1.1, stagger: 0.08 }, 0.95),
+            });
 
-        gsap.to(roleChars.chars, {
-            clipPath: "inset(0% 0 0 0)",
-            duration: 1.1,
-            ease: "power4.out",
-            stagger: 0.02,
-            delay: 0.3,
-            onComplete: () => gsap.set(roleChars.chars, { willChange: "auto" }),
-        });
+            tl.from(".hero-fade", { autoAlpha: 0, y: 16, duration: 1, stagger: 0.08 }, 1.1);
 
-        const bioSplit = new SplitText(".hero-bio-text", { type: "lines" });
-
-        gsap.from(bioSplit.lines, {
-            opacity: 0,
-            y: 16,
-            duration: 0.7,
-            ease: "power3.out",
-            stagger: 0.1,
-            delay: 0.85,
-        });
-
-        gsap.fromTo(".hero-cta",
-            { opacity: 0, y: 10 },
-            { opacity: 1, y: 0, duration: 0.5, ease: "power3.out", delay: 1.1 }
-        );
-
-        gsap.set(imageRef.current, {
-            clipPath: "inset(100% 0% 0% 0%)",
-            scale: 0.95,
-            transformOrigin: "bottom center",
-            willChange: "clip-path, transform",
-        });
-
-        gsap.to(imageRef.current, {
-            clipPath: "inset(0% 0% 0% 0%)",
-            scale: 1,
-            duration: 1.1,
-            ease: "expo.inOut",
-            delay: 0.15,
-            onComplete: () => {
-                gsap.set(imageRef.current, { willChange: "auto", clearProps: "clipPath,scale" });
-            },
-        });
-
-        gsap.to(imageRef.current, {
-            y: 40,
-            ease: "none",
-            scrollTrigger: {
-                trigger: container.current,
-                start: "top top",
-                end: "bottom top",
-                scrub: true,
-            },
-        });
-
-    }, { scope: container });
+            // Gentle depth on scroll (desktop): the portrait drifts slower than the type.
+            gsap.matchMedia().add("(min-width: 768px)", () => {
+                const scrub = { trigger: container.current, start: "top top", end: "bottom top", scrub: true };
+                gsap.to(".hero-portrait", { y: () => window.innerHeight * 0.08, ease: "none", scrollTrigger: { ...scrub } });
+                gsap.to(".hero-type", { yPercent: -18, ease: "none", scrollTrigger: { ...scrub } });
+            });
+        },
+        { scope: container }
+    );
 
     return (
         <section
             ref={container}
-            className="relative w-full overflow-hidden"
-            style={{
-                minHeight: "100svh",
-                background: "linear-gradient(to bottom, #e8e8e8 0%, #a8c2df 100%, #bdcbdb 100%)",
-            }}
+            className="grain relative isolate w-full overflow-hidden bg-[linear-gradient(180deg,#ecebe8_0%,#d3dbe4_55%,#a8c2df_100%)]"
         >
-            <div
-                className="max-w-420 mx-auto relative w-full h-full"
-                style={{ minHeight: "100svh", paddingTop: "80px" }}
-            >
-                <div
-                    className="flex flex-col items-center gap-5 md:hidden h-full"
-                    style={{ minHeight: "calc(100svh - 80px)" }}
-                >
-                    <div className="text-center pt-8 px-6" style={{ lineHeight: 0.88 }}>
-                        <span
-                            className="hero-greeting block text-3xl text-[#0d1b2a]/80 mb-2"
-                        >
-                            {heroData.greeting} {heroData.name}
-                        </span>
-                        <span
-                            className="hero-role block text-[#0d1b2a] font-semibold text-2xl"
-                        >
-                            Frontend Engineer
-                        </span>
-                    </div>
-
-                    <div className="px-6 pb-12 text-center max-w-sm">
-                        <p className="hero-bio-text text-[#0d1b2a] font-medium leading-relaxed text-[14px]">
-                            {heroData.bio}
-                        </p>
-                        {/* <Link
-                            href={heroData.cta.href}
-                            style={{ opacity: 0 }} className="hero-cta mt-5 inline-flex items-center gap-2 text-[#0d1b2a] font-bold text-xs uppercase tracking-widest hover:opacity-50 transition-opacity"
-                        >
-                            {heroData.cta.label}
-                            <ArrowIcon />
-                        </Link> */}
-                    </div>
-
-                    <div
-                        ref={imageRef}
-                        className="absolute bottom-0 flex-shrink-0"
-                        style={{ width: "min(80vw, 340px)", height: "min(60vw, 420px)" }}
-                    >
-                        <Image
-                            src={heroData.image}
-                            alt={heroData.name}
-                            fill
-                            // priority
-                            className="object-contain object-bottom opacity-80"
-                            sizes="80vw"
-                            unoptimized
-                        />
-                    </div>
+            <div className="js-intro relative mx-auto flex min-h-svh max-w-[1680px] flex-col px-5 pt-28 sm:px-8 md:min-h-[max(100svh,680px)] md:pt-32">
+                {/* Top row: availability + location */}
+                <div className="hero-fade z-20 flex items-center justify-between gap-4 text-[13px] text-ink/60">
+                    <Availability />
+                    <span className="hidden sm:inline">Based in {site.location}</span>
                 </div>
 
-                <div
-                    className="hidden md:flex absolute inset-0 items-end justify-between px-8 pb-0"
-                    style={{ top: "80px" }}
-                >
-                    <div className="relative self-end pb-16" style={{ lineHeight: 0.88 }}>
-                        <span
-                            className="hero-greeting block text-4xl text-[#0d1b2a]/70 ml-2"
-                            style={{ letterSpacing: "-0.04em" }}
-                        >
-                            {heroData.greeting} {heroData.name}
-                        </span>
+                {/* Mobile: copy first, portrait below */}
+                <div className="hero-type relative z-20 mt-10 flex flex-col md:hidden">
+                    <p className="hero-greeting text-[17px] text-ink/70">{greeting}</p>
+                    <h1 className="mt-3 font-display text-[clamp(4.5rem,24vw,9rem)] uppercase leading-[0.82] tracking-[-0.01em] text-ink">
                         {heroData.roles.map((role) => (
-                            <span
-                                key={role}
-                                className="hero-role block text-[#0d1b2a] uppercase"
-                                style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(4.5rem, 12vw, 13rem)", letterSpacing: "-0.02em" }}
-                            >
+                            <span key={role} className="hero-role block">
                                 {role}
                             </span>
                         ))}
+                    </h1>
+                    <p className="hero-bio mt-6 max-w-sm text-[15px] leading-relaxed text-ink/75">{heroData.bio}</p>
+                    <div className="hero-fade mt-7 flex flex-wrap gap-3">
+                        <PillButton href={heroData.cta.href} variant="solid">
+                            {heroData.cta.label}
+                        </PillButton>
+                        <PillButton href="/work">See work</PillButton>
                     </div>
+                </div>
 
-                    <div
-                        ref={imageRef}
-                        className="absolute bottom-0 left-1/2 -translate-x-1/2 z-10"
-                        style={{
-                            width: "clamp(280px, 34vw, 600px)",
-                            height: "clamp(420px, 78vh, 900px)",
-                        }}
-                    >
+                <div className="relative z-10 mx-auto mt-8 aspect-square w-[min(100%,440px)] md:hidden">
+                    <div className="hero-portrait absolute inset-0">
                         <Image
                             src={heroData.image}
                             alt={heroData.name}
                             fill
                             priority
                             className="object-contain object-bottom"
-                            sizes="(max-width: 1024px) 34vw, 600px"
-                            unoptimized
+                            sizes="(max-width: 480px) 100vw, 440px"
                         />
                     </div>
+                </div>
 
-                    <div className="relative z-20 self-end pb-20 max-w-[260px] lg:max-w-[360px]">
-                        {/* <div className="mb-3 text-[#0d1b2a]/70 text-2xl">
-                            <ArrowDownRight />
-                        </div> */}
-                        <p
-                            className="hero-bio-text text-[#0d1b2a] font-medium leading-relaxed"
-                            style={{ fontSize: "clamp(13px, 1.1vw, 15px)" }}
-                        >
+                {/* Desktop composition */}
+                <div className="relative hidden flex-1 md:block">
+                    <div className="hero-type absolute bottom-[9svh] left-0 z-0">
+                        <p className="hero-greeting mb-2 ml-1 text-[clamp(1.25rem,1.9vw,2rem)] tracking-[-0.02em] text-ink/70">
+                            {greeting}
+                        </p>
+                        <h1 style={{ fontSize: "min(11.5vw, 20svh)" }} className="font-display uppercase leading-[0.8] tracking-[-0.01em] text-ink">
+                            {heroData.roles.map((role) => (
+                                <span key={role} className="hero-role block">
+                                    {role}
+                                </span>
+                            ))}
+                        </h1>
+                    </div>
+
+                    <div className="absolute bottom-0 left-1/2 z-10 h-[min(82svh,980px)] w-[min(40vw,640px)] -translate-x-[38%] lg:-translate-x-1/2">
+                        <div className="hero-portrait absolute inset-0">
+                            <Image
+                                src={heroData.image}
+                                alt={heroData.name}
+                                fill
+                                priority
+                                className="object-contain object-bottom"
+                                sizes="(max-width: 1280px) 40vw, 640px"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="absolute bottom-[11svh] right-0 z-20 w-[clamp(240px,24vw,380px)]">
+                        <p className="hero-bio text-[clamp(14px,1.05vw,16px)] font-medium leading-relaxed text-ink/80">
                             {heroData.bio}
                         </p>
-                        <Link
-                            href=''
-                            style={{ opacity: 0 }} className="hero-cta mt-5 inline-flex items-center gap-2 text-[#0d1b2a] font-bold text-sm uppercase tracking-widest hover:opacity-50 transition-opacity"
-                        >
-                            Let's Talk
-                            <ArrowRightIcon />
-                        </Link>
+                        <div className="hero-fade mt-6 flex flex-wrap items-center gap-3">
+                            <PillButton href={heroData.cta.href} variant="solid">
+                                {heroData.cta.label}
+                            </PillButton>
+                        </div>
                     </div>
+
+                    <button
+                        type="button"
+                        onClick={() => scrollTo("#selected-work")}
+                        className="hero-fade group absolute bottom-6 right-0 z-20 hidden items-center gap-3 text-[12px] font-medium uppercase tracking-[0.2em] text-ink/60 transition-colors hover:text-ink lg:flex"
+                    >
+                        Scroll
+                        <span className="relative block h-10 w-px overflow-hidden bg-ink/15">
+                            <span className="absolute inset-x-0 top-0 h-1/2 animate-[scroll-cue_1.8s_var(--ease-in-out-quart)_infinite] bg-ink" />
+                        </span>
+                    </button>
                 </div>
             </div>
         </section>

@@ -1,3 +1,5 @@
+import { site } from "./site";
+
 export type WorkExperience = {
     role: string;
     company: string;
@@ -16,7 +18,7 @@ export type AboutData = {
 export const aboutData: AboutData = {
     heading: "About Me",
     bio: [
-        "Hi, I'm Femi — a Front-End Engineer and WordPress Developer with a passion for building websites and web applications that are fast, functional and visually compelling. Over the past 3+ years, I've worked across agencies and businesses — delivering everything from WooCommerce rebuilds and Elementor sites to full Next.js applications with headless CMS integrations. I enjoy the full journey, from interpreting a designer's Figma file to shipping a product people actually use.",
+        "Hi, I'm Femi — a Front-End Engineer and WordPress Developer with a passion for building websites and web applications that are fast, functional and visually compelling. Over the past 4+ years, I've worked across agencies and businesses — delivering everything from WooCommerce rebuilds and Elementor sites to full Next.js applications with headless CMS integrations. I enjoy the full journey, from interpreting a designer's Figma file to shipping a product people actually use.",
         "Outside of work, you'll find me writing rap lyrics, grinding mobile games, or at church on Sunday morning.",
     ],
     images: [
@@ -46,5 +48,5 @@ export const aboutData: AboutData = {
         "/images/workspace.jpg",
         "/images/workspace.jpg",
     ],
-    resumeUrl: "/resume.pdf",
+    resumeUrl: site.resumeUrl,
 };

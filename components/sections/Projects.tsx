@@ -2,212 +2,160 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useRef, useState, useCallback } from "react";
+import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
-import { gsap } from "@/lib/gsap";
-import { ArrowUpRightIcon } from "lucide-react";
-import { Project } from "@/lib/strapi/types";
+import { gsap, hasFinePointer } from "@/lib/gsap";
+import type { Project } from "@/lib/strapi/types";
+import { ArrowUpRight } from "@/components/ui/Icons";
+import { Eyebrow, PillButton } from "@/components/ui/Primitives";
 
-function ProjectCard({
-    project,
-    index,
-}: {
-    project: Project;
-    index: number;
-}) {
+/** Cover image that follows the cursor with a "View" badge and drifts on scroll. */
+export function ProjectCard({ project, index, className = "" }: { project: Project; index: number; className?: string }) {
     const cardRef = useRef<HTMLAnchorElement>(null);
-    const capsuleRef = useRef<HTMLDivElement>(null);
-    const [hovered, setHovered] = useState(false);
+    const badgeRef = useRef<HTMLDivElement>(null);
 
-    const handleMouseEnter = useCallback(() => {
-        setHovered(true);
-        gsap.to(capsuleRef.current, {
-            opacity: 1,
-            scale: 1,
-            duration: 0.35,
-            ease: "back.out(1.4)",
-        });
-    }, []);
+    useGSAP(
+        () => {
+            const card = cardRef.current;
+            const badge = badgeRef.current;
+            if (!card || !badge) return;
 
-    const handleMouseLeave = useCallback(() => {
-        setHovered(false);
-        gsap.to(capsuleRef.current, {
-            opacity: 0,
-            scale: 0.8,
-            duration: 0.25,
-            ease: "power2.in",
-        });
-    }, []);
-
-    const handleMouseMove = useCallback(
-        (e: React.MouseEvent<HTMLAnchorElement>) => {
-            if (!cardRef.current || !capsuleRef.current) return;
-            const rect = cardRef.current.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            gsap.to(capsuleRef.current, {
-                x: x - capsuleRef.current.offsetWidth / 2,
-                y: y - capsuleRef.current.offsetHeight / 2,
-                duration: 0.45,
-                ease: "power2.out",
+            gsap.fromTo(
+                ".pc-media",
+                { clipPath: "inset(14% 6% 14% 6% round 20px)" },
+                {
+                    clipPath: "inset(0% 0% 0% 0% round 16px)",
+                    duration: 1.5,
+                    ease: "expo.out",
+                    scrollTrigger: { trigger: card, start: "top 88%" },
+                }
+            );
+            gsap.from(".pc-text > *", {
+                y: 28,
+                autoAlpha: 0,
+                duration: 1.1,
+                ease: "expo.out",
+                stagger: 0.07,
+                scrollTrigger: { trigger: card, start: "top 80%" },
             });
+
+            if (!hasFinePointer()) return;
+
+            const xTo = gsap.quickTo(badge, "x", { duration: 0.5, ease: "power3.out" });
+            const yTo = gsap.quickTo(badge, "y", { duration: 0.5, ease: "power3.out" });
+            const media = card.querySelector<HTMLElement>(".pc-media")!;
+
+            const move = (e: PointerEvent) => {
+                const r = media.getBoundingClientRect();
+                xTo(e.clientX - r.left);
+                yTo(e.clientY - r.top);
+            };
+            const enter = (e: PointerEvent) => {
+                const r = media.getBoundingClientRect();
+                gsap.set(badge, { x: e.clientX - r.left, y: e.clientY - r.top });
+                gsap.to(badge, { scale: 1, autoAlpha: 1, duration: 0.5, ease: "expo.out" });
+            };
+            const leave = () => gsap.to(badge, { scale: 0.4, autoAlpha: 0, duration: 0.35, ease: "power3.out" });
+
+            media.addEventListener("pointermove", move);
+            media.addEventListener("pointerenter", enter);
+            media.addEventListener("pointerleave", leave);
+            return () => {
+                media.removeEventListener("pointermove", move);
+                media.removeEventListener("pointerenter", enter);
+                media.removeEventListener("pointerleave", leave);
+            };
         },
-        []
+        { scope: cardRef }
     );
 
     return (
-        <Link
-            ref={cardRef}
-            href={`/work/${project.slug}`}
-            className="ps-block group flex flex-col gap-5 relative"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            onMouseMove={handleMouseMove}
-        >
-            <div
-                className="ps-img-wrap relative overflow-hidden rounded-xl"
-                style={{ aspectRatio: "4/3" }}
-            >
+        <Link ref={cardRef} href={`/work/${project.slug}`} className={`group flex flex-col gap-6 ${className}`}>
+            <div className="pc-media relative overflow-hidden rounded-2xl bg-ink/5 transition-[translate,box-shadow] duration-700 ease-out-expo group-hover:-translate-y-1.5 group-hover:shadow-[0_30px_60px_-30px_rgba(13,27,42,0.45)] md:cursor-none">
+                {/* Natural aspect ratio so the whole cover is visible, uncropped. */}
                 <Image
                     src={project.cover}
                     alt={project.title}
-                    fill
-                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                    width={1920}
+                    height={1280}
+                    className="block h-auto w-full"
                     sizes="(max-width: 768px) 100vw, 50vw"
-                    unoptimized
                 />
-                <div className="absolute inset-0 bg-[#0d1b2a]/0 group-hover:bg-[#0d1b2a]/10 transition-colors duration-500" />
+                <div className="absolute inset-0 bg-ink/0 transition-colors duration-700 group-hover:bg-ink/5" />
 
-                {/* Floating capsule — pointer-events:none so it never blocks hover */}
                 <div
-                    ref={capsuleRef}
-                    className="absolute top-0 left-0 pointer-events-none z-20 opacity-0 scale-75"
-                    style={{ willChange: "transform, opacity" }}
+                    ref={badgeRef}
+                    aria-hidden="true"
+                    className="pointer-events-none invisible absolute left-0 top-0 z-20 -ml-12 -mt-12 flex h-24 w-24 scale-50 items-center justify-center rounded-full bg-paper/95 text-[13px] font-semibold text-ink opacity-0 shadow-[0_10px_40px_-10px_rgba(13,27,42,0.4)] backdrop-blur"
                 >
-                    <div className="flex items-center gap-2 text-xs md:text-base bg-white/95 backdrop-blur-sm text-[#0d1b2a] font-medium tracking-wide px-4 py-2.5 rounded-full shadow-[0_8px_32px_rgba(13,27,42,0.18)] border border-white/60 whitespace-nowrap select-none">
-                        View project
-                        <span className="inline-block transition-transform duration-300">
-                            <ArrowUpRightIcon size={20} />
-                        </span>
-                    </div>
+                    <span className="flex items-center gap-1">
+                        View <ArrowUpRight size={14} />
+                    </span>
                 </div>
             </div>
 
-            <div className="ps-text flex flex-col gap-4">
-                <div className="flex items-center gap-3">
-                    <span className="text-[#0d1b2a]/20 font-mono text-xs">
-                        {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span className="w-8 h-px bg-[#0d1b2a]/15" />
-                    <div className="flex items-center gap-2 flex-wrap">
-                        {project.tags.map((tag) => (
-                            <span
-                                key={tag}
-                                className="text-xs text-[#0d1b2a]/40 border border-[#0d1b2a]/12 rounded-full px-2.5 py-0.5"
-                            >
-                                {tag}
-                            </span>
-                        ))}
-                    </div>
+            <div className="pc-text flex flex-col gap-3">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-ink/45">
+                    <span className="font-mono tabular-nums">{String(index + 1).padStart(2, "0")}</span>
+                    <span className="h-px w-6 bg-ink/20" />
+                    <span>{project.tags.slice(0, 3).join("  ·  ")}</span>
+                    <span className="ml-auto font-mono tabular-nums">{project.year}</span>
                 </div>
-
-                <h3
-                    className="font-[family-name:var(--font-heading)] text-[#0d1b2a] leading-[1.05] lg:max-w-[70%]"
-                    style={{ fontSize: "clamp(1.6rem, 2.5vw, 2.5rem)" }}
-                >
+                <h3 className="flex items-center justify-between gap-6 font-heading text-[clamp(1.75rem,2.6vw,2.6rem)] leading-[1.05] text-ink">
                     {project.title}
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-ink/15 transition-all duration-500 ease-out-expo group-hover:rotate-45 group-hover:border-ink group-hover:bg-ink group-hover:text-paper">
+                        <ArrowUpRight size={16} />
+                    </span>
                 </h3>
-
-                <p className="text-[#0d1b2a]/50 leading-relaxed text-[14px] md:max-w-[80%]">
-                    {project.overview}
-                </p>
+                <p className="max-w-xl text-[15px] leading-relaxed text-ink/55">{project.overview}</p>
             </div>
         </Link>
     );
 }
 
 export default function ProjectsSection({ projects }: { projects: Project[] }) {
-    const container = useRef<HTMLDivElement>(null);
+    const container = useRef<HTMLElement>(null);
 
-    useGSAP(() => {
-        gsap.from(".ps-header", {
-            opacity: 0,
-            y: 16,
-            duration: 0.7,
-            ease: "power3.out",
-            scrollTrigger: { trigger: ".ps-header", start: "top 88%" },
-        });
-
-        gsap.utils.toArray<HTMLElement>(".ps-block").forEach((block) => {
-            const img = block.querySelector<HTMLElement>(".ps-img-wrap");
-            if (img) {
-                gsap.fromTo(
-                    img,
-                    { clipPath: "inset(100% 0 0 0)" },
-                    {
-                        clipPath: "inset(0% 0 0 0)",
-                        duration: 1,
-                        ease: "power4.inOut",
-                        scrollTrigger: { trigger: block, start: "top 82%" },
-                    }
-                );
-            }
-
-            const text = block.querySelector<HTMLElement>(".ps-text");
-            if (text) {
-                gsap.from(text, {
-                    opacity: 0,
-                    y: 24,
-                    duration: 0.7,
-                    ease: "power3.out",
-                    delay: 0.2,
-                    scrollTrigger: { trigger: block, start: "top 82%" },
-                });
-            }
-        });
-    }, { scope: container });
+    useGSAP(
+        () => {
+            gsap.from(".ps-header > *", {
+                y: 30,
+                autoAlpha: 0,
+                duration: 1.1,
+                ease: "expo.out",
+                stagger: 0.08,
+                scrollTrigger: { trigger: ".ps-header", start: "top 88%" },
+            });
+        },
+        { scope: container }
+    );
 
     return (
-        <section ref={container} className="px-8 sm:px-12 lg:px-16 py-28 lg:py-36">
-            <div className="max-w-[1600px] mx-auto">
-
-                <div className="ps-header flex items-end justify-between mb-14 lg:mb-20">
-                    <div className="flex items-baseline gap-3">
-                        <h2
-                            className="font-[family-name:var(--font-heading)] text-[#0d1b2a] leading-none uppercase"
-                            style={{ fontSize: "clamp(2rem, 4vw, 3.25rem)" }}
-                        >
-                            Selected Work
+        <section id="selected-work" ref={container} className="scroll-mt-24 px-5 pb-28 pt-28 sm:px-8 lg:pb-40 lg:pt-36">
+            <div className="mx-auto max-w-[1680px]">
+                <div className="ps-header mb-14 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between lg:mb-20">
+                    <div className="flex flex-col gap-5">
+                        <Eyebrow>Selected work</Eyebrow>
+                        <h2 className="font-heading text-[clamp(2.6rem,6vw,5.5rem)] leading-[0.95] tracking-[-0.02em] text-ink">
+                            Recent <em className="italic text-ink/50">launches</em>
+                            <sup className="ml-2 align-super font-sans text-sm font-medium not-italic text-ink/35">
+                                ({String(projects.length).padStart(2, "0")})
+                            </sup>
                         </h2>
-                        <span className="text-[#0d1b2a]/25 font-mono text-sm">
-                            {String(projects.length).padStart(2, "0")}
-                        </span>
                     </div>
-                    <Link
-                        href="/work"
-                        className="hidden sm:flex items-center gap-1.5 text-sm text-[#0d1b2a]/45 hover:text-[#0d1b2a] transition-colors duration-200 group"
-                    >
-                        View all
-                        <span className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200 inline-block">↗</span>
-                    </Link>
+                    <PillButton href="/work">All projects</PillButton>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-20">
+                <div className="grid grid-cols-1 gap-x-10 gap-y-20 md:grid-cols-2 lg:gap-x-16 lg:gap-y-28">
                     {projects.map((project, i) => (
-                        <ProjectCard key={project.slug} project={project} index={i} />
+                        <ProjectCard
+                            key={project.slug}
+                            project={project}
+                            index={i}
+                            className={i % 2 === 1 ? "md:mt-32" : ""}
+                        />
                     ))}
                 </div>
-
-                <div className="sm:hidden mt-14">
-                    <Link
-                        href="/work"
-                        className="flex items-center gap-2 text-sm text-[#0d1b2a]/50 hover:text-[#0d1b2a] transition-colors duration-200"
-                    >
-                        View all projects ↗
-                    </Link>
-                </div>
-
             </div>
         </section>
     );
