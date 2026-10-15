@@ -15,6 +15,38 @@
     },
     "projects": [
         {
+            "id": 16,
+            "slug": "blink",
+            "title": "Bl!nk",
+            "year": 2026,
+            "tags": [
+                "Fintech",
+                "Landing Page",
+                "Next.js",
+                "Motion"
+            ],
+            "overview": "Marketing landing page for Bl!nk, a Naira travel card for the diaspora and expatriates visiting Nigeria — built to feel as premium as the card itself.",
+            "description": "Built the landing page for Bl!nk, a Naira card that lets travellers fund in 180+ currencies and spend in Nigeria from the moment they land. The page carries a lot of story — benefits, where to spend, the app, onboarding steps, testimonials, press and FAQs — so the build leans on cinematic video, scroll-driven storytelling and smooth scrolling to keep it moving without feeling heavy.",
+            "cover": "/projects/blink/cover.webp",
+            "hero": "/projects/blink/cover.webp",
+            "media": [
+                "/projects/blink/benefits.webp",
+                "/projects/blink/features.webp",
+                "/projects/blink/where-to-use.webp",
+                "/projects/blink/app.webp",
+                "/projects/blink/how-it-works.webp"
+            ],
+            "role": "Frontend Developer — Landing Page Build",
+            "url": "https://blink-web-landing.vercel.app/",
+            "stack": [
+                "Next.js",
+                "Tailwind CSS",
+                "Lenis"
+            ],
+            "challenge": "A long, content-rich page — stats, a supported-currency showcase, seven spending scenarios, app features, a three-step onboarding flow, testimonials, press quotes and FAQs — that still had to feel fast, cinematic and effortless to scroll on every device.",
+            "solution": "- **Cinematic hero** with full-bleed background video and the Bl!nk card as the focal point\n- **Animated odometer stats** for customers, currencies, inflow and the KYC grace period\n- **Scroll-driven storytelling** for spending scenarios and the onboarding steps, paired with Lenis smooth scrolling\n- **Infinite marquees** for supported currencies and testimonials, plus an accessible FAQ accordion\n- **Responsive, mobile-first layout** built with Next.js and Tailwind CSS"
+        },
+        {
             "id": 8,
             "slug": "sfi-agri",
             "title": "SFI Agri",
