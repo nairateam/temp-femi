@@ -4,6 +4,9 @@
   --ink: #0d1b2a;
   --paper: #f7f6f3;
   --mist: #a8c2df;
+  /* Hero atmosphere: a pale step between paper and mist, and a deeper mist for wave bodies. */
+  --haze: #d3dbe4;
+  --tide: #7393bb;
   --background: var(--paper);
   --foreground: var(--ink);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -18,6 +21,8 @@
   --color-ink: var(--ink);
   --color-paper: var(--paper);
   --color-mist: var(--mist);
+  --color-haze: var(--haze);
+  --color-tide: var(--tide);
   --font-sans: var(--font-body);
   --font-heading: var(--font-heading);
   --font-display: var(--font-display);

@@ -7,6 +7,7 @@ import { gsap, SplitText } from "@/lib/gsap";
 import type { HeroData } from "@/lib/strapi/types";
 import { site } from "@/lib/data/site";
 import { Availability, PillButton } from "@/components/ui/Primitives";
+import HeroBackground from "@/components/ui/HeroBackground";
 import { useScrollTo } from "@/components/providers/SmoothScroll";
 
 export default function Hero({ heroData }: { heroData: HeroData }) {
@@ -63,8 +64,10 @@ export default function Hero({ heroData }: { heroData: HeroData }) {
     return (
         <section
             ref={container}
-            className="grain relative isolate w-full overflow-hidden bg-[linear-gradient(180deg,#ecebe8_0%,#d3dbe4_55%,#a8c2df_100%)]"
+            className="relative isolate w-full overflow-hidden bg-[linear-gradient(180deg,var(--paper)_0%,var(--haze)_55%,var(--mist)_100%)]"
         >
+            {/* Animated grain + satin-wave atmosphere; the CSS gradient above is its fallback. */}
+            <HeroBackground className="-z-10" />
             <div className="js-intro relative mx-auto flex min-h-svh max-w-[1680px] flex-col px-5 pt-28 sm:px-8 md:min-h-[max(100svh,680px)] md:pt-32">
                 {/* Top row: availability + location */}
                 <div className="hero-fade z-20 flex items-center justify-between gap-4 text-[13px] text-ink/60">
